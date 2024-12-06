@@ -44,6 +44,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         if(cc == "cs"){
                             cc = "cz";
                         }
+                        console.log("TEST");
                         console.log('Country Code: ' + countryCode);
 
                         // Otevře rozbalovací menu
