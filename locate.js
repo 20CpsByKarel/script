@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
                         // Otevře rozbalovací menu
                         const toggleElement = document.querySelector('.navbar-toggler.dropdown-toggle');
-                        if(cc != countryCode)){
+                        if(cc != countryCode){
                            if (toggleElement) {
                             toggleElement.click();
 
