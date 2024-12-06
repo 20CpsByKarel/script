@@ -45,7 +45,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
                         // Otevře rozbalovací menu
                         const toggleElement = document.querySelector('.navbar-toggler.dropdown-toggle');
-                        if (toggleElement) {
+                        if(upgates.language != "cs" && countryCode !="cz){
+                           if (toggleElement) {
                             toggleElement.click();
 
                             // Zpoždění pro zajištění načtení rozbalovacího menu
@@ -64,6 +65,8 @@ document.addEventListener("DOMContentLoaded", function() {
                         } else {
                             console.log("Toggle element not found");
                         }
+                        }
+                        
                     })
                     .catch(() => {
                         console.log("CHYBA při získávání země");
