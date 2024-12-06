@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", function() {
             .then(data => {
                 var ipAddress = data.ip;
                 console.log('IP Address: ' + ipAddress);
+                        console.log("TEST");
 
                 fetch("https://ipinfo.io/" + ipAddress + "/json")
                     .then(response => response.json())
