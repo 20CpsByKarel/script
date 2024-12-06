@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", function() {
                             countryCode = "tl";
                         }
                         const cc = upgates.language;
-                        if(cc = "cs"){
+                        if(cc == "cs"){
                             cc = "cz";
                         }
                         console.log('Country Code: ' + countryCode);
