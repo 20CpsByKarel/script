@@ -40,12 +40,15 @@ document.addEventListener("DOMContentLoaded", function() {
                         } else {
                             countryCode = "tl";
                         }
-
+                        const cc = upgates.language;
+                        if(cc = "cs"){
+                            cc = "cz";
+                        }
                         console.log('Country Code: ' + countryCode);
 
                         // Otevře rozbalovací menu
                         const toggleElement = document.querySelector('.navbar-toggler.dropdown-toggle');
-                        if(!(upgates.language == "cs" && countryCode =="cz")){
+                        if(cc != countryCode)){
                            if (toggleElement) {
                             toggleElement.click();
 
