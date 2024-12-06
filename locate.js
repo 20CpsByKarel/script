@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const val = 'true';
     const ses = sessionStorage.getItem(key);
     console.log('SESH: ' + ses);
-
+    console.log(upgates.language);
     if (!ses) {
         console.log("Running ipify");
 
