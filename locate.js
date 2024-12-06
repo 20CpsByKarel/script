@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", function() {
                         } else {
                             countryCode = "tl";
                         }
-                        const cc = upgates.language;
+                        let cc = upgates.language;
                         if(cc == "cs"){
                             cc = "cz";
                         }
