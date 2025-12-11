@@ -2,13 +2,13 @@ document.addEventListener("DOMContentLoaded", function() {
     const key = 'ipified';
     const val = 'true';
     const dismissedKey = 'langRedirectDismissed';
-    const stored = localStorage.getItem(key);
-    const dismissed = localStorage.getItem(dismissedKey);
+    const ses = sessionStorage.getItem(key) || localStorage.getItem(key);
+    const dismissed = sessionStorage.getItem(dismissedKey) || localStorage.getItem(dismissedKey);
     
-    console.log('STORED: ' + stored);
-    console.log('Site language: ' + upgates.language);
+    console.log('SESH: ' + ses);
+    console.log('Current site language: ' + upgates.language);
     
-    if (!stored && !dismissed) {
+    if (!ses && !dismissed) {
         console.log("Running ipify");
         fetch("https://api.ipify.org?format=json")
             .then(response => response.json())
@@ -21,49 +21,46 @@ document.addEventListener("DOMContentLoaded", function() {
                         var country = data.country;
                         console.log("Země: " + country);
                         
+                        // Určení preferovaného jazyka uživatele
+                        let preferredLang = null;
                         const userLang = navigator.language || navigator.userLanguage;
-                        console.log('User Browser Language: ' + userLang);
+                        console.log('User browser language: ' + userLang);
                         
-                        // Určení preferovaného jazyka
-                        var countryCode;
+                        // Aktuální jazyk webu
+                        let currentSiteLang = upgates.language;
+                        if (currentSiteLang === "cs") {
+                            currentSiteLang = "cz";
+                        }
                         
-                        if (country === "CZ" || country === "SK") {
-                            // Česko nebo Slovensko
+                        // Logika:
+                        // 1. Uživatel je v ČR s českým/slovenským prohlížečem → nabídnout cz
+                        // 2. Uživatel je v ČR ale má jiný jazyk prohlížeče → nabídnout en
+                        // 3. Uživatel je v cizí zemi → nabídnout tl (obecná změna jazyka)
+                        
+                        if (country === "CZ") {
                             if (userLang.startsWith("cs") || userLang.startsWith("sk")) {
-                                countryCode = "cz";
+                                preferredLang = "cz";
                             } else {
-                                // Člověk v CZ/SK ale s jiným jazykem prohlížeče → EN
-                                countryCode = "en";
+                                preferredLang = "en";
                             }
-                        } else if (userLang.startsWith("cs") || userLang.startsWith("sk")) {
-                            // Jiná země, ale browser v češtině/slovenštině → CZ
-                            countryCode = "cz";
-                        } else if (userLang.startsWith("en")) {
-                            // Anglický browser → EN
-                            countryCode = "en";
                         } else {
-                            // Jiný jazyk → nabídneme obecnou změnu (tl)
-                            countryCode = "tl";
+                            // Cizí země - nabídnout změnu jazyka
+                            preferredLang = "tl";
                         }
                         
-                        // Aktuální jazyk stránky
-                        let cc = upgates.language;
-                        if (cc == "cs") {
-                            cc = "cz";
-                        }
+                        console.log('Preferred language: ' + preferredLang);
+                        console.log('Current site language (normalized): ' + currentSiteLang);
                         
-                        console.log('Detected preference: ' + countryCode);
-                        console.log('Current site language: ' + cc);
-                        
-                        // Zobrazit popup POUZE pokud:
-                        // 1. Jazyky se liší
-                        // 2. A není to situace kdy countryCode je "tl" a stránka je "en" (to je OK)
-                        if (cc !== countryCode && !(countryCode === "tl" && cc === "en")) {
-                            showLanguagePopup(countryCode, cc, key, val, dismissedKey);
+                        // Zobrazit popup když:
+                        // 1. Je to "tl" (cizí země) - vždy nabídnout změnu
+                        // 2. Nebo preferovaný jazyk se LIŠÍ od aktuálního jazyka webu
+                        if (preferredLang === "tl" || (preferredLang && preferredLang !== currentSiteLang)) {
+                            console.log('Showing popup - preferredLang: ' + preferredLang);
+                            showLanguagePopup(preferredLang, currentSiteLang, key, val, dismissedKey);
                         } else {
-                            // Jazyky odpovídají - vše OK, uložíme
-                            console.log("Languages match - no popup needed");
-                            localStorage.setItem(key, val);
+                            console.log('Languages match - no popup needed');
+                            // Označit jako zpracované, aby se to znovu nekontrolovalo
+                            sessionStorage.setItem(key, val);
                         }
                     })
                     .catch(() => {
@@ -99,10 +96,10 @@ function showLanguagePopup(targetLang, currentLang, key, val, dismissedKey) {
         },
         tl: {
             title: "Language Change",
-            message: "We detected a different language preference.",
-            recommendation: "For proper website functionality, we recommend changing the version.",
-            question: "Would you like to switch to a different language version of this website?",
-            confirm: "Yes, switch",
+            message: "You are visiting from a different region.",
+            recommendation: "For the best experience, you may want to change the language.",
+            question: "Would you like to switch to a different language version?",
+            confirm: "Yes, show options",
             cancel: "No, stay here"
         }
     };
@@ -212,7 +209,8 @@ function showLanguagePopup(targetLang, currentLang, key, val, dismissedKey) {
     
     // Event listener pro potvrzení
     document.getElementById('lang-popup-confirm').addEventListener('click', function() {
-        // Uložit do localStorage PŘED přesměrováním
+        // Nastavit PŘED přesměrováním
+        sessionStorage.setItem(key, val);
         localStorage.setItem(key, val);
         overlay.remove();
         
@@ -220,6 +218,14 @@ function showLanguagePopup(targetLang, currentLang, key, val, dismissedKey) {
         const toggleElement = document.querySelector('.navbar-toggler.dropdown-toggle');
         if (toggleElement) {
             toggleElement.click();
+            
+            // Pro "tl" jen otevřeme dropdown a necháme uživatele vybrat
+            if (targetLang === "tl") {
+                console.log("Dropdown opened for manual language selection");
+                return;
+            }
+            
+            // Pro konkrétní jazyk (cz, en) automaticky klikneme na správnou volbu
             setTimeout(() => {
                 const dropdownMenu = document.querySelector('.dropdown-menu._hdr_lngl');
                 const aElement = dropdownMenu ? dropdownMenu.querySelector('a.flag-' + targetLang) : null;
@@ -238,6 +244,7 @@ function showLanguagePopup(targetLang, currentLang, key, val, dismissedKey) {
     // Event listener pro zrušení
     document.getElementById('lang-popup-cancel').addEventListener('click', function() {
         overlay.remove();
+        sessionStorage.setItem(dismissedKey, 'true');
         localStorage.setItem(dismissedKey, 'true');
     });
     
@@ -245,6 +252,7 @@ function showLanguagePopup(targetLang, currentLang, key, val, dismissedKey) {
     overlay.addEventListener('click', function(e) {
         if (e.target === overlay) {
             overlay.remove();
+            sessionStorage.setItem(dismissedKey, 'true');
             localStorage.setItem(dismissedKey, 'true');
         }
     });
