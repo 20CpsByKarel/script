@@ -2,56 +2,68 @@ document.addEventListener("DOMContentLoaded", function() {
     const key = 'ipified';
     const val = 'true';
     const dismissedKey = 'langRedirectDismissed';
-    const ses = sessionStorage.getItem(key) || localStorage.getItem(key);
-    const dismissed = sessionStorage.getItem(dismissedKey) || localStorage.getItem(dismissedKey);
+    const stored = localStorage.getItem(key);
+    const dismissed = localStorage.getItem(dismissedKey);
     
-    console.log('SESH: ' + ses);
-    console.log(upgates.language);
+    console.log('STORED: ' + stored);
+    console.log('Site language: ' + upgates.language);
     
-    if (!ses && !dismissed) {
+    if (!stored && !dismissed) {
         console.log("Running ipify");
         fetch("https://api.ipify.org?format=json")
             .then(response => response.json())
             .then(data => {
                 var ipAddress = data.ip;
                 console.log('IP Address: ' + ipAddress);
-                console.log("TEST");
                 fetch("https://ipinfo.io/" + ipAddress + "/json")
                     .then(response => response.json())
                     .then(data => {
                         var country = data.country;
                         console.log("Země: " + country);
-                        var countryCodes = {
-                            CZ: "cz",
-                            EN: "en"
-                        };
-                        var countryCode = countryCodes[country] || "en";
-                        if (!countryCode) {
-                            countryCode = "en";
-                        }
-                        if (countryCode === "cz") {
-                            const userLang = navigator.language || navigator.userLanguage;
-                            console.log('User Language: ' + userLang);
+                        
+                        const userLang = navigator.language || navigator.userLanguage;
+                        console.log('User Browser Language: ' + userLang);
+                        
+                        // Určení preferovaného jazyka
+                        var countryCode;
+                        
+                        if (country === "CZ" || country === "SK") {
+                            // Česko nebo Slovensko
                             if (userLang.startsWith("cs") || userLang.startsWith("sk")) {
                                 countryCode = "cz";
                             } else {
+                                // Člověk v CZ/SK ale s jiným jazykem prohlížeče → EN
                                 countryCode = "en";
                             }
+                        } else if (userLang.startsWith("cs") || userLang.startsWith("sk")) {
+                            // Jiná země, ale browser v češtině/slovenštině → CZ
+                            countryCode = "cz";
+                        } else if (userLang.startsWith("en")) {
+                            // Anglický browser → EN
+                            countryCode = "en";
                         } else {
+                            // Jiný jazyk → nabídneme obecnou změnu (tl)
                             countryCode = "tl";
                         }
                         
+                        // Aktuální jazyk stránky
                         let cc = upgates.language;
-                        if(cc == "cs"){
+                        if (cc == "cs") {
                             cc = "cz";
                         }
                         
-                        console.log("TEST");
-                        console.log('Country Code: ' + countryCode);
+                        console.log('Detected preference: ' + countryCode);
+                        console.log('Current site language: ' + cc);
                         
-                        // Pokud se jazyky liší, zobrazíme popup
-                        if(cc != countryCode){
+                        // Zobrazit popup POUZE pokud:
+                        // 1. Jazyky se liší
+                        // 2. A není to situace kdy countryCode je "tl" a stránka je "en" (to je OK)
+                        if (cc !== countryCode && !(countryCode === "tl" && cc === "en")) {
                             showLanguagePopup(countryCode, cc, key, val, dismissedKey);
+                        } else {
+                            // Jazyky odpovídají - vše OK, uložíme
+                            console.log("Languages match - no popup needed");
+                            localStorage.setItem(key, val);
                         }
                     })
                     .catch(() => {
@@ -200,12 +212,11 @@ function showLanguagePopup(targetLang, currentLang, key, val, dismissedKey) {
     
     // Event listener pro potvrzení
     document.getElementById('lang-popup-confirm').addEventListener('click', function() {
-        // Nastavit OBOJÍ pro jistotu - sessionStorage i localStorage
-        sessionStorage.setItem(key, val);
+        // Uložit do localStorage PŘED přesměrováním
         localStorage.setItem(key, val);
         overlay.remove();
         
-        // Původní logika pro přepnutí jazyka
+        // Logika pro přepnutí jazyka
         const toggleElement = document.querySelector('.navbar-toggler.dropdown-toggle');
         if (toggleElement) {
             toggleElement.click();
@@ -227,7 +238,6 @@ function showLanguagePopup(targetLang, currentLang, key, val, dismissedKey) {
     // Event listener pro zrušení
     document.getElementById('lang-popup-cancel').addEventListener('click', function() {
         overlay.remove();
-        sessionStorage.setItem(dismissedKey, 'true');
         localStorage.setItem(dismissedKey, 'true');
     });
     
@@ -235,7 +245,6 @@ function showLanguagePopup(targetLang, currentLang, key, val, dismissedKey) {
     overlay.addEventListener('click', function(e) {
         if (e.target === overlay) {
             overlay.remove();
-            sessionStorage.setItem(dismissedKey, 'true');
             localStorage.setItem(dismissedKey, 'true');
         }
     });
