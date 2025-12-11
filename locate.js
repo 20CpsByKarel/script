@@ -2,8 +2,8 @@ document.addEventListener("DOMContentLoaded", function() {
     const key = 'ipified';
     const val = 'true';
     const dismissedKey = 'langRedirectDismissed';
-    const ses = sessionStorage.getItem(key);
-    const dismissed = sessionStorage.getItem(dismissedKey);
+    const ses = sessionStorage.getItem(key) || localStorage.getItem(key);
+    const dismissed = sessionStorage.getItem(dismissedKey) || localStorage.getItem(dismissedKey);
     
     console.log('SESH: ' + ses);
     console.log(upgates.language);
@@ -200,6 +200,9 @@ function showLanguagePopup(targetLang, currentLang, key, val, dismissedKey) {
     
     // Event listener pro potvrzení
     document.getElementById('lang-popup-confirm').addEventListener('click', function() {
+        // Nastavit OBOJÍ pro jistotu - sessionStorage i localStorage
+        sessionStorage.setItem(key, val);
+        localStorage.setItem(key, val);
         overlay.remove();
         
         // Původní logika pro přepnutí jazyka
@@ -212,7 +215,6 @@ function showLanguagePopup(targetLang, currentLang, key, val, dismissedKey) {
                 console.log('aElement: ', aElement);
                 if (aElement) {
                     aElement.click();
-                    sessionStorage.setItem(key, val);
                 } else {
                     console.log("Country code not found in dropdown menu");
                 }
@@ -226,6 +228,7 @@ function showLanguagePopup(targetLang, currentLang, key, val, dismissedKey) {
     document.getElementById('lang-popup-cancel').addEventListener('click', function() {
         overlay.remove();
         sessionStorage.setItem(dismissedKey, 'true');
+        localStorage.setItem(dismissedKey, 'true');
     });
     
     // Zavření při kliknutí mimo popup
@@ -233,6 +236,7 @@ function showLanguagePopup(targetLang, currentLang, key, val, dismissedKey) {
         if (e.target === overlay) {
             overlay.remove();
             sessionStorage.setItem(dismissedKey, 'true');
+            localStorage.setItem(dismissedKey, 'true');
         }
     });
 }
