@@ -71,19 +71,19 @@ function showLanguagePopup(targetLang, currentLang, key, val, dismissedKey) {
     const texts = {
         cz: {
             title: "Změna jazyka",
-            message: "Zjistili jsme, že preferujete češtinu. Přejete si přepnout na českou verzi stránek?",
+            message: "Zjistili jsme, že preferujete češtinu.<br>Pro správnou funkčnost webu doporučujeme změnit verzi.<br>Přejete si přepnout na českou verzi stránek?",
             confirm: "Ano, přepnout",
             cancel: "Ne, zůstat zde"
         },
         en: {
             title: "Language Change",
-            message: "We detected that you prefer English. Would you like to switch to the English version?",
+            message: "We detected that you prefer English.<br>For proper website functionality, we recommend changing the version.<br>Would you like to switch to the English version?",
             confirm: "Yes, switch",
             cancel: "No, stay here"
         },
         tl: {
             title: "Language Change",
-            message: "Would you like to switch to a different language version of this website?",
+            message: "We detected your language preference.<br>For proper website functionality, we recommend changing the version.<br>Would you like to switch to a different language version?",
             confirm: "Yes, switch",
             cancel: "No, stay here"
         }
