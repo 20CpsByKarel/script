@@ -71,19 +71,25 @@ function showLanguagePopup(targetLang, currentLang, key, val, dismissedKey) {
     const texts = {
         cz: {
             title: "Změna jazyka",
-            message: "Zjistili jsme, že preferujete češtinu. Přejete si přepnout na českou verzi stránek?",
+            message: "Zjistili jsme, že preferujete češtinu.",
+            recommendation: "Pro správnou funkčnost webu doporučujeme změnit verzi.",
+            question: "Přejete si přepnout na českou verzi stránek?",
             confirm: "Ano, přepnout",
             cancel: "Ne, zůstat zde"
         },
         en: {
             title: "Language Change",
-            message: "We detected that you prefer English. Would you like to switch to the English version?",
+            message: "We detected that you prefer English.",
+            recommendation: "For proper website functionality, we recommend changing the version.",
+            question: "Would you like to switch to the English version?",
             confirm: "Yes, switch",
             cancel: "No, stay here"
         },
         tl: {
             title: "Language Change",
-            message: "Would you like to switch to a different language version of this website?",
+            message: "We detected a different language preference.",
+            recommendation: "For proper website functionality, we recommend changing the version.",
+            question: "Would you like to switch to a different language version of this website?",
             confirm: "Yes, switch",
             cancel: "No, stay here"
         }
@@ -138,9 +144,17 @@ function showLanguagePopup(targetLang, currentLang, key, val, dismissedKey) {
                 font-size: 1.5em;
             }
             #lang-popup p {
-                margin: 0 0 25px 0;
+                margin: 0 0 10px 0;
                 color: #666;
                 line-height: 1.5;
+            }
+            #lang-popup .recommendation {
+                color: #007bff;
+                font-weight: 500;
+                margin-bottom: 10px;
+            }
+            #lang-popup .question {
+                margin-bottom: 25px;
             }
             #lang-popup .btn-container {
                 display: flex;
@@ -173,6 +187,8 @@ function showLanguagePopup(targetLang, currentLang, key, val, dismissedKey) {
         </style>
         <h3>🌐 ${t.title}</h3>
         <p>${t.message}</p>
+        <p class="recommendation">${t.recommendation}</p>
+        <p class="question">${t.question}</p>
         <div class="btn-container">
             <button class="btn-confirm" id="lang-popup-confirm">${t.confirm}</button>
             <button class="btn-cancel" id="lang-popup-cancel">${t.cancel}</button>
